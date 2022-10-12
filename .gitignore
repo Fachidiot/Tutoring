@@ -58,3 +58,6 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+ProjectSettings/ProjectVersion.txt
+ProjectSettings/PresetManager.asset
+ProjectSettings/ProjectSettings.asset
