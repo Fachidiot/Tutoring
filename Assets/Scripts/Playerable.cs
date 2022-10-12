@@ -5,6 +5,8 @@ using UnityEngine;
 public class Playerable : MonoBehaviour
 {
     public float Speed = 5f;
+    public GameObject AttackArea;
+    public float ComboTimeLimit;
 
     Animator animator;
     CustomInput input;
@@ -12,7 +14,11 @@ public class Playerable : MonoBehaviour
     SpriteRenderer spriteRenderer;
 
     bool m_isMove;
+    int m_comboCounter = 0;
+
+    // Animation IDs
     int m_animIDvelocity;
+    int m_animIDcombo;
 
     void Start()
     {
@@ -21,13 +27,17 @@ public class Playerable : MonoBehaviour
         rigidbody2D = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        AttackArea.SetActive(false);
+
         m_animIDvelocity = Animator.StringToHash("Velocity");
+        m_animIDcombo = Animator.StringToHash("AttackCombo");
     }
 
     // Update is called once per frame
     void Update()
     {
         Move();
+        Attack();
     }
 
     void Move()
@@ -43,5 +53,22 @@ public class Playerable : MonoBehaviour
             spriteRenderer.flipX = true;
         else
             spriteRenderer.flipX = false;
+    }
+
+    float ComboTimer;
+    void Attack()
+    {
+        if (input.mouseL)
+        {
+            ComboTimer += Time.deltaTime;
+            AttackArea.SetActive(true);
+            //if (ComboTimer > ComboTimeLimit)
+            //    m_comboCounter = 0;
+            //else
+            m_comboCounter++;
+            animator.SetInteger(m_animIDcombo, m_comboCounter);
+            m_comboCounter = 0;
+            AttackArea.SetActive(false);
+        }
     }
 }
