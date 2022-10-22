@@ -4,22 +4,27 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
-    public float Damage;
+    float damage = 20f;
+    float addedDamage;
 
-    BoxCollider2D collider;
-
-    void Start()
+    public void AddDamage(float combo)
     {
-        collider = GetComponent<BoxCollider2D>();
+        addedDamage = damage * combo;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public void ResetDamage()
+    {
+        addedDamage = 0f;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         Enemy hitEnemy = collision.gameObject.GetComponent<Enemy>();
 
         if (hitEnemy != null)
-            hitEnemy.GetDamage(Damage);
-    }
-
-    
+        {
+            hitEnemy.GetComponent<Rigidbody2D>().AddForce(transform.position - hitEnemy.transform.position);
+            hitEnemy.GetDamage(addedDamage == 0 ? damage : addedDamage);
+        }
+    }    
 }

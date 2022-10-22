@@ -4,6 +4,20 @@ using UnityEngine;
 
 public class Playerable : MonoBehaviour
 {
+    enum State
+    {
+        None,
+        Attack,
+        Defend
+    }
+
+    enum PlayerAttack
+    {
+        None,
+        Attack1,
+        Attack2,
+        Attack3
+    }
     public float Speed = 5f;
     public GameObject AttackArea;
     public float ComboTimeLimit;
@@ -12,12 +26,16 @@ public class Playerable : MonoBehaviour
     CustomInput input;
     Rigidbody2D rigidbody2D;
     SpriteRenderer spriteRenderer;
+    State state;
+    PlayerAttack m_attackType;
 
     bool m_isMove;
+    bool m_isAttacking;
     int m_comboCounter = 0;
 
     // Animation IDs
     int m_animIDvelocity;
+    int m_animIDisAttack;
     int m_animIDcombo;
 
     void Start()
@@ -30,6 +48,7 @@ public class Playerable : MonoBehaviour
         AttackArea.SetActive(false);
 
         m_animIDvelocity = Animator.StringToHash("Velocity");
+        m_animIDisAttack = Animator.StringToHash("isAttack");
         m_animIDcombo = Animator.StringToHash("AttackCombo");
     }
 
@@ -37,7 +56,8 @@ public class Playerable : MonoBehaviour
     void Update()
     {
         Move();
-        Attack();
+        if (input.mouseL)
+            StartAttack();
     }
 
     void Move()
@@ -55,20 +75,42 @@ public class Playerable : MonoBehaviour
             spriteRenderer.flipX = false;
     }
 
-    float ComboTimer;
-    void Attack()
+    float m_time = 0f;
+    public void StartAttack()
     {
-        if (input.mouseL)
+        m_isAttacking = true;
+        AttackArea.SetActive(true);
+        animator.SetBool(m_animIDisAttack, m_isAttacking);
+
+        if (state != State.Attack)
         {
-            ComboTimer += Time.deltaTime;
-            AttackArea.SetActive(true);
-            //if (ComboTimer > ComboTimeLimit)
-            //    m_comboCounter = 0;
-            //else
-            m_comboCounter++;
-            animator.SetInteger(m_animIDcombo, m_comboCounter);
-            m_comboCounter = 0;
-            AttackArea.SetActive(false);
+            state = State.Attack;
+            m_attackType = PlayerAttack.Attack1;
+            m_time = Time.fixedTime;
         }
+        else if (m_attackType <= PlayerAttack.Attack2 && Time.fixedTime - m_time > 0.2f ||
+            m_attackType == PlayerAttack.Attack3 && Time.fixedTime - m_time > 0.3f)
+        {
+            StopCoroutine("CheckCombo");
+            AttackArea.GetComponent<Attack>().AddDamage(((int)m_attackType));
+            m_attackType = m_attackType + 1;
+            m_time = Time.fixedTime;
+        }
+        animator.SetInteger(m_animIDcombo, ((int)m_attackType));
+        StartCoroutine("CheckCombo");
+    }
+
+    IEnumerator CheckCombo()
+    {
+        yield return new WaitForSeconds(0.7f);
+
+        m_time = 0f;
+        state = State.None;
+        m_isAttacking = false;
+        AttackArea.SetActive(false);
+        AttackArea.GetComponent<Attack>().ResetDamage();
+        m_attackType = PlayerAttack.None;
+        animator.SetBool(m_animIDisAttack, m_isAttacking);
+        animator.SetInteger(m_animIDcombo, ((int)m_attackType));
     }
 }

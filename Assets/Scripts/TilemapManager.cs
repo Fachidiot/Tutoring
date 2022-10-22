@@ -23,19 +23,15 @@ public class TilemapManager : MonoBehaviour
             for (int j = 0; j < tilemaps.GetLength(1); j++)
             {
                 tilemaps[j, i] = tilemapObjects[count++];
-                // Debug.Log(tilemaps[i,j]);
             }
         }
     }
 
     void Update()
     {
-        playerTilePosition.x = (int)(player.position.x / tileSize);
-        playerTilePosition.y = (int)(player.position.y / tileSize);
-
-        playerTilePosition.x -= player.position.x < 0 ? 1 : 0;
-        playerTilePosition.y -= player.position.y < 0 ? 1 : 0;
-
+        playerTilePosition.x = Mathf.RoundToInt(player.position.x / tileSize);
+        playerTilePosition.y = Mathf.RoundToInt(player.position.y / tileSize);
+        
         if (currentTilePosition != playerTilePosition) {
             currentTilePosition = playerTilePosition;
             

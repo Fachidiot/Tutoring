@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Monster : MonoBehaviour
 {
-    public float HP;
     Transform target;
     public float speed;
 
@@ -25,16 +24,11 @@ public class Enemy : MonoBehaviour
     {
         Vector3 direction = (target.position - transform.position).normalized;
         rigid.velocity = direction * speed;
-    }
+    }
 
     void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.GetComponent<Playerable>())
             Debug.Log("Player Attack");
-    }
-
-    public void GetDamage(float damage)
-    {
-        HP -= damage;
     }
 }
