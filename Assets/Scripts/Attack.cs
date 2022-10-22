@@ -20,4 +20,6 @@ public class Attack : MonoBehaviour
         if (hitEnemy != null)
             hitEnemy.GetDamage(Damage);
     }
+
+    
 }
